@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Rights Petitions Hub</title>
+
+  <!-- Security hardening -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-hrhub'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" />
+  <meta http-equiv="Referrer-Policy" content="no-referrer" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="description" content="Accessible UK human rights petitions hub: find petitions by category, check expiry dates and signature counts, and make your voice heard." />
+
+  <style>
+    :root {
+      --bg: #0a0f0c;
+      --surface: #0e221b;
+      --surface-2: #123224;
+      --text: #f4f7f5;
+      --muted: #cfe3d7;
+      --brand: #2bd26e;
+      --card: #e7f0e8;
+      --card-text: #0e1a14;
+      --focus: #8cf7b7;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --error: #ff6b6b;
+      --warning: #ff8f00;
+      --success: #2bd26e;
+    }
+    
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7faf8;
+        --surface: #0e221b;
+        --text: #08110d;
+        --muted: #3a4c44;
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    a:focus {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+    
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      padding: .5rem .75rem;
+      border-radius: 8px;
+      z-index: 1000;
+    }
+    
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+      width: auto;
+      height: auto;
+    }
+
+    header {
+      background: linear-gradient(180deg, #0f2f23, #0a2018 55%);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      position: sticky;
+      top: 0;
+      z-index: 500;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+    
+    .brand__logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--brand);
+      display: inline-block;
+    }
+    
+    .nav-list {
+      list-style: none;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .nav-link {
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255,255,255,.06);
+    }
+    
+    .nav-link[aria-current="page"] {
+      background: rgba(255,255,255,.06);
+    }
+    
+    .auth-btn {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.18);
+      transition: background-color 0.2s ease;
+    }
+    
+    .auth-btn:hover {
+      background: rgba(255,255,255,.06);
+    }
+
+    /* Floating Navigation */
+    .floating-nav {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 47, 35, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 50px;
+      padding: 10px 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 400;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    
+    .floating-nav a {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+    
+    .floating-nav a:hover {
+      background: rgba(255,255,255,.1);
+    }
+    
+    .floating-nav a.active {
+      background: var(--brand);
+      color: #052112;
+    }
+
+    .hero {
+      background: #0f2f23;
+      border-top: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    
+    .hero-inner {
+      padding: 64px 0 48px;
+      text-align: center;
+    }
+    
+    .eyebrow {
+      color: var(--brand);
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    
+    .hero h1 {
+      margin: .4rem auto 1rem;
+      font-size: clamp(2rem, 3.6vw + 1rem, 3.6rem);
+      line-height: 1.15;
+    }
+    
+    .hero p {
+      color: var(--muted);
+      max-width: 60ch;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .cta {
+      display: inline-block;
+      padding: 12px 18px;
+      background: var(--brand);
+      color: #052112;
+      font-weight: 800;
+      border-radius: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,.2);
+    }
+
+    .strip {
+      background: #0d241b;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+      padding: 26px 0 56px;
+    }
+    
+    .card {
+      background: var(--card);
+      color: var(--card-text);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.15);
+      border: 1px solid #dbe6de;
+      transition: transform .12s ease, box-shadow .12s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,.18);
+    }
+    
+    .card h3 {
+      margin: .2rem 0 .4rem;
+      font-size: 1.25rem;
+      line-height: 1.3;
+      flex-grow: 1;
+    }
+    
+    .meta {
+      font-size: .95rem;
+      color: #2c4137;
+      margin: .35rem 0;
+    }
+    
+    .meta strong {
+      color: #0e1a14;
+    }
+    
+    .badge {
+      display: inline-block;
+      font-size: .8rem;
+      background: rgba(0,0,0,.12);
+      color: #0e1a14;
+      padding: .2rem .5rem;
+      border-radius: 999px;
+      margin-left: .5rem;
+    }
+    
+    .status--warn {
+      color: var(--warning);
+      font-weight: 700;
+    }
+    
+    .status--danger {
+      color: var(--error);
+      font-weight: 800;
+    }
+    
+    .status--expired {
+      color: #777;
+      text-decoration: line-through;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .input, .number, .select {
+      background: #18382b;
+      color: #e7f5ee;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 10px;
+      padding: 10px 12px;
+      transition: border-color 0.2s ease;
+    }
+    
+    .input:focus, .number:focus, .select:focus {
+      border-color: var(--brand);
+    }
+    
+    .input::placeholder {
+      color: #9fc8b2;
+    }
+    
+    .sort {
+      min-width: 200px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      display: none;
+      z-index: 1100;
+    }
+    
+    .overlay[aria-hidden="false"] {
+      display: block;
+    }
+    
+    .sidepanel {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: min(560px, 100%);
+      background: #0f2f23;
+      color: #eaf6ef;
+      box-shadow: -10px 0 30px rgba(0,0,0,.4);
+      transform: translateX(100%);
+      transition: transform .25s ease;
+      z-index: 1200;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidepanel[aria-hidden="false"] {
+      transform: translateX(0);
+    }
+    
+    .sidepanel header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: #102a1f;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    
+    .close-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.25);
+      color: #eaf6ef;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .close-btn:hover {
+      background: rgba(255,255,255,.1);
+    }
+    
+    .panel-body {
+      padding: 16px 20px;
+      overflow: auto;
+    }
+    
+    .panel-meta {
+      color: #bfe7cf;
+      margin: 8px 0;
+    }
+    
+    .external {
+      margin-top: 12px;
+      display: inline-block;
+    }
+    
+    .chart-wrap {
+      margin-top: 14px;
+      background: #123224;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    
+    canvas {
+      width: 100%;
+      height: 220px;
+    }
+
+    .section {
+      padding: 28px 0 64px;
+      scroll-margin-top: 80px;
+    }
+    
+    .form {
+      display: grid;
+      gap: 18px;
+      max-width: 820px;
+    }
+    
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+    
+    .label {
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    
+    .req {
+      color: #ffb449;
+      font-weight: 800;
+      margin-left: .25rem;
+    }
+    
+    .textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+    
+    .input, .number, .select, .textarea {
+      background: #163628;
+      color: #e7f5ee;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 12px;
+      padding: 12px 14px;
+      width: 100%;
+      line-height: 1.45;
+      transition: border-color 0.2s ease;
+    }
+    
+    .input:focus, .number:focus, .select:focus, .textarea:focus {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+      border-color: var(--brand);
+    }
+    
+    .help {
+      color: #a6cbb7;
+      font-size: .95rem;
+      margin-top: 2px;
+    }
+    
+    .muted {
+      color: var(--muted);
+    }
+    
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .btn {
+      background: var(--brand);
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,.2);
+    }
+    
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.28);
+    }
+    
+    .btn.secondary:hover {
+      background: rgba(255,255,255,.06);
+    }
+    
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .error {
+      color: var(--error);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    
+    .success {
+      color: var(--success);
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 1300;
+    }
+    
+    .modal[aria-hidden="false"] {
+      display: grid;
+      place-items: center;
+    }
+    
+    .modal-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+    }
+    
+    .dialog {
+      position: relative;
+      background: #0f2f23;
+      color: #eaf6ef;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 18px;
+      max-width: min(820px, 92vw);
+      max-height: 85vh;
+      overflow: auto;
+      box-shadow: var(--shadow);
+      line-height: 1.6;
+    }
+    
+    .dialog h3 {
+      margin-top: 0;
+    }
+    
+    .dialog ul {
+      margin: 0 0 0 1.1rem;
+    }
+    
+    .dialog li {
+      margin: .25rem 0;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: var(--muted);
+      padding: 24px 0 48px;
+      background: #0a1b14;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: var(--brand);
+      color: #052112;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 399;
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .back-to-top:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+    
+    @media (max-width: 720px) {
+      .topbar {
+        flex-wrap: wrap;
+      }
+      
+      .nav-list {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .controls {
+        justify-content: space-between;
+      }
+      
+      .floating-nav {
+        bottom: 10px;
+        padding: 8px 15px;
+      }
+      
+      .floating-nav a {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+      
+      .back-to-top {
+        bottom: 70px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    
+    /* Password strength meter */
+    .meter {
+      height: 6px;
+      background: rgba(255,255,255,.1);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    
+    .meter span {
+      display: block;
+      height: 100%;
+      width: 0;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    
+    .meter--1 span {
+      width: 25%;
+      background: var(--error);
+    }
+    
+    .meter--2 span {
+      width: 50%;
+      background: var(--warning);
+    }
+    
+    .meter--3 span {
+      width: 100%;
+      background: var(--success);
+    }
+    
+    /* Loading state */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+    
+    /* Reset password specific styles */
+    .reset-step {
+      display: none;
+    }
+    
+    .reset-step.active {
+      display: block;
+    }
+    
+    .text-link {
+      color: var(--brand);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    .text-link:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header role="banner">
+    <div class="container topbar">
+      <a class="brand nav-link" href="#home" aria-current="page">
+        <span class="brand__logo" aria-hidden="true"></span>
+        <span>Petitions' Campaign</span>
+      </a>
+      <nav aria-label="Primary" role="navigation">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="#home">Home</a></li>
+          <li><a class="nav-link" href="#petitions">Petitions</a></li>
+          <li><a class="nav-link" href="#submit">Submit</a></li>
+          <li><a class="nav-link auth-btn" href="#" id="openSignIn">Sign in</a></li>
+          <li><a class="nav-link auth-btn" href="#" id="openSignUp">Register</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Floating Navigation -->
+  <nav class="floating-nav" aria-label="Quick navigation">
+    <a href="#home" class="active">Home</a>
+    <a href="#petitions">Petitions</a>
+    <a href="#submit">Submit</a>
+    <a href="#" id="floatingSignIn">Sign In</a>
+  </nav>
+
+  <!-- Back to top button -->
+  <div class="back-to-top" id="backToTop" aria-label="Back to top">↑</div>
+
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="container hero-inner">
+      <p class="eyebrow">UK Human Rights Hub</p>
+      <h1 id="hero-title">Make Your Voice Heard</h1>
+      <p>Support, add, and win petitions that matter to you.</p>
+      <a class="cta" href="#petitions">Browse petitions</a>
+    </div>
+  </section>
+
+  <div class="strip" role="presentation"></div>
+
+  <main id="main" class="container" role="main">
+    <h2 class="sr-only">Featured petitions</h2>
+
+    <section id="petitions" class="section" aria-label="Human Rights Petitions">
+      <h2 style="margin-bottom: 1.5rem;">Current Petitions</h2>
+      <div class="toolbar" role="region" aria-label="Filter petitions">
+        <div class="controls" role="group" aria-label="Search and filters">
+          <label for="q" class="sr-only">Search title or keywords</label>
+          <input id="q" class="input" type="search" inputmode="search" placeholder="Search petitions…" aria-describedby="q-help" />
+          <span id="q-help" class="sr-only">Type keywords to filter petitions by title or category.</span>
+
+          <label for="minSig" class="sr-only">Minimum signatures</label>
+          <input id="minSig" class="number" type="number" min="0" step="1" placeholder="Min signatures" aria-label="Minimum signatures" />
+
+          <label for="sort" class="sr-only">Sort petitions</label>
+          <select id="sort" class="select sort" aria-label="Sort petitions">
+            <option value="expiry">Earliest expiry</option>
+            <option value="new">Newly added</option>
+            <option value="most">Most signatures</option>
+          </select>
+        </div>
+        <span id="count" aria-live="polite"></span>
+      </div>
+
+      <div id="petitions-list" class="grid" role="list">
+        <!-- Loading state -->
+        <div class="empty-state" id="loading-state">
+          <p>Loading petitions...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Side panel -->
+    <div class="overlay" id="overlay" aria-hidden="true"></div>
+    <aside class="sidepanel" id="sidepanel" aria-hidden="true" aria-labelledby="panel-title" role="dialog">
+      <header>
+        <h2 id="panel-title" style="margin:0;font-size:1.1rem">Petition details</h2>
+        <button class="close-btn" id="panel-close" aria-label="Close details">Close</button>
+      </header>
+      <div class="panel-body">
+        <h3 id="panel-h3"></h3>
+        <p class="panel-meta" id="panel-summary"></p>
+        <p class="panel-meta" id="panel-start"></p>
+        <p class="panel-meta" id="panel-exp"></p>
+        <p class="panel-meta" id="panel-sig"></p>
+        <a id="panel-link" class="cta external" href="#" target="_blank" rel="noopener noreferrer">Open on parliament.uk</a>
+        <div class="chart-wrap">
+          <canvas id="sigChart" aria-label="Signature trend" role="img"></canvas>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Submit -->
+    <section id="submit" aria-labelledby="submit-title" class="container section">
+      <h2 id="submit-title" style="margin-top:8px">Submit a petition</h2>
+      <p class="muted" style="margin-top:6px">You'll need to be registered and agree to the submission policy. Only secure UK petition links are accepted.</p>
+
+      <form id="petitionForm" class="form" novalidate>
+        <div class="field">
+          <label for="petLink" class="label">Official petition link <span class="req" aria-hidden="true">*</span></label>
+          <input id="petLink" class="input" type="url" required placeholder="https://petition.parliament.uk/petitions/123456" aria-describedby="petLinkHelp" />
+          <div id="petLinkHelp" class="help">Accepted: HTTPS links to trusted UK petition sources (e.g. <code>petition.parliament.uk</code>).</div>
+        </div>
+
+        <div class="field">
+          <label for="petTitle" class="label">Title <span class="req" aria-hidden="true">*</span></label>
+          <input id="petTitle" class="input" type="text" required maxlength="180" placeholder="Enter the petition title" />
+          <div class="help">Max 180 characters. Use clear, neutral language.</div>
+        </div>
+
+        <div class="field">
+          <label for="petDesc" class="label">Description <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="petDesc" class="textarea" required maxlength="1000" placeholder="Describe what the petition asks for, who is affected, and the desired outcome." aria-describedby="descHelp descCount"></textarea>
+          <div id="descHelp" class="help">Be factual, respectful, and concise. No illegal, hateful, or defamatory content.</div>
+          <div id="descCount" class="help" aria-live="polite">0 / 1000</div>
+        </div>
+
+        <div class="row">
+          <input id="agreePolicy" type="checkbox" required />
+          <label for="agreePolicy">I agree to the <a href="#" id="openPolicy">Submission &amp; Safety Policy</a>.</label>
+        </div>
+
+        <div id="formErrors" class="error" role="alert" aria-live="polite"></div>
+        <div id="formSuccess" class="success" aria-live="polite" hidden>Submitted for review. Thank you!</div>
+
+        <div class="actions">
+          <button type="submit" class="btn" id="submitBtn">Submit for review</button>
+          <a href="#home" class="btn secondary">Cancel</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- Policy modal -->
+    <div class="modal" id="policyModal" aria-hidden="true" role="dialog" aria-labelledby="policyTitle">
+      <div class="modal-bg" data-close></div>
+      <div class="dialog">
+        <h3 id="policyTitle">Submission &amp; Safety Policy (UK standards)</h3>
+        <p><strong>Purpose.</strong> To protect users and comply with UK law, all submitted petitions must be safe, lawful, and respectful.</p>
+        <h4>1) Eligibility &amp; Registration</h4>
+        <ul>
+          <li>Submitting a petition link requires a registered account and verified email.</li>
+          <li>We record time, IP (short-retained), and basic device data for security and abuse prevention (see Privacy Notice).</li>
+        </ul>
+        <h4>2) Secure Links Only</h4>
+        <ul>
+          <li>Links must use <strong>HTTPS</strong> and come from trusted UK petition providers (e.g. <code>petition.parliament.uk</code>).</li>
+        </ul>
+        <h4>3) Content Standards (UK Law)</h4>
+        <ul>
+          <li>No illegal content (hate, incitement, terrorism support, threats, doxxing, defamation, contempt of court, etc.).</li>
+          <li>Respect privacy and data protection (UK GDPR).</li>
+        </ul>
+        <h4>4) Moderation &amp; Appeals</h4>
+        <ul>
+          <li>All submissions are moderated; repeated breaches may lead to suspension.</li>
+          <li>Appeals are available via the contact form.</li>
+        </ul>
+        <footer>
+          <button class="close-btn" data-close>Close</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Sign in modal -->
+    <div class="modal" id="signinModal" aria-hidden="true" role="dialog" aria-labelledby="signinTitle">
+      <div class="modal-bg" data-close></div>
+      <div class="dialog">
+        <h3 id="signinTitle">Sign in</h3>
+        <form id="signinForm" class="auth-grid" novalidate>
+          <div class="field">
+            <label for="siEmail" class="label">Email <span class="req" aria-hidden="true">*</span></label>
+            <input id="siEmail" class="input" type="email" required autocomplete="username" placeholder="you@example.com" />
+          </div>
+          <div class="field pwd">
+            <label for="siPassword" class="label">Password <span class="req" aria-hidden="true">*</span></label>
+            <input id="siPassword" class="input" type="password" required autocomplete="current-password" />
+            <button type="button" class="toggle-pwd" data-toggle="siPassword" aria-label="Show or hide password">👁</button>
+          </div>
+          <div class="row">
+            <input id="siRemember" type="checkbox" />
+            <label for="siRemember">Remember me on this device</label>
+          </div>
+          <div id="siErrors" class="error" role="alert" aria-live="polite"></div>
+          <div class="actions">
+            <button type="submit" class="btn">Sign in</button>
+            <a href="#" class="btn secondary" id="forgotLink">Forgot password?</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign up modal -->
+    <div class="modal" id="signupModal" aria-hidden="true" role="dialog" aria-labelledby="signupTitle">
+      <div class="modal-bg" data-close></div>
+      <div class="dialog">
+        <h3 id="signupTitle">Create an account</h3>
+        <form id="signupForm" class="auth-grid" novalidate>
+          <div class="field">
+            <label for="suName" class="label">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input id="suName" class="input" type="text" required autocomplete="name" placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label for="suEmail" class="label">Email <span class="req" aria-hidden="true">*</span></label>
+            <input id="suEmail" class="input" type="email" required autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <div class="field pwd">
+            <label for="suPassword" class="label">Password <span class="req" aria-hidden="true">*</span></label>
+            <input id="suPassword" class="input" type="password" required autocomplete="new-password" aria-describedby="pwdHelp" />
+            <button type="button" class="toggle-pwd" data-toggle="suPassword" aria-label="Show or hide password">👁</button>
+            <div id="pwdHelp" class="help">At least 8 characters, including a number and a symbol.</div>
+            <div id="pwdMeter" class="meter" aria-hidden="true"><span></span></div>
+          </div>
+          <div class="field">
+            <label for="suPassword2" class="label">Confirm password <span class="req" aria-hidden="true">*</span></label>
+            <input id="suPassword2" class="input" type="password" required autocomplete="new-password" />
+          </div>
+          <div class="row">
+            <input id="suAgree" type="checkbox" required />
+            <label for="suAgree">I agree to the <a href="#" id="openPolicyFromSignup">Submission &amp; Safety Policy</a>.</label>
+          </div>
+          <div id="suErrors" class="error" role="alert" aria-live="polite"></div>
+          <div class="actions">
+            <button type="submit" class="btn">Create account</button>
+            <button type="button" class="btn secondary" data-close>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal" id="resetModal" aria-hidden="true" role="dialog" aria-labelledby="resetTitle">
+      <div class="modal-bg" data-close></div>
+      <div class="dialog">
+        <h3 id="resetTitle">Reset your password</h3>
+        
+        <!-- Step 1: Email verification -->
+        <div class="reset-step active" id="resetStep1">
+          <form id="resetForm1">
+            <div class="field">
+              <label for="resetEmail" class="label">Email address <span class="req" aria-hidden="true">*</span></label>
+              <input id="resetEmail" class="input" type="email" required autocomplete="email" placeholder="you@example.com" />
+              <div class="help">Enter the email address associated with your account.</div>
+            </div>
+            <div id="resetErrors1" class="error" role="alert" aria-live="polite"></div>
+            <div class="actions">
+              <button type="submit" class="btn">Send reset code</button>
+              <button type="button" class="btn secondary" data-close>Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2: Code verification -->
+        <div class="reset-step" id="resetStep2">
+          <form id="resetForm2">
+            <div class="field">
+              <label for="resetCode" class="label">Verification code <span class="req" aria-hidden="true">*</span></label>
+              <input id="resetCode" class="input" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required />
+              <div class="help">Enter the 6-digit code sent to your email.</div>
+            </div>
+            <div id="resetErrors2" class="error" role="alert" aria-live="polite"></div>
+            <div class="actions">
+              <button type="submit" class="btn">Verify code</button>
+              <button type="button" class="btn secondary" id="resendCode">Resend code</button>
+              <button type="button" class="btn secondary" id="backToEmail">Back</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: New password -->
+        <div class="reset-step" id="resetStep3">
+          <form id="resetForm3">
+            <div class="field">
+              <label for="newPassword" class="label">New password <span class="req" aria-hidden="true">*</span></label>
+              <input id="newPassword" class="input" type="password" required autocomplete="new-password" aria-describedby="newPwdHelp" />
+              <div id="newPwdHelp" class="help">At least 8 characters, including a number and a symbol.</div>
+              <div id="newPwdMeter" class="meter" aria-hidden="true"><span></span></div>
+            </div>
+            <div class="field">
+              <label for="confirmPassword" class="label">Confirm new password <span class="req" aria-hidden="true">*</span></label>
+              <input id="confirmPassword" class="input" type="password" required autocomplete="new-password" />
+            </div>
+            <div id="resetErrors3" class="error" role="alert" aria-live="polite"></div>
+            <div id="resetSuccess" class="success" aria-live="polite" style="display:none">Password reset successfully! You can now sign in with your new password.</div>
+            <div class="actions">
+              <button type="submit" class="btn">Reset password</button>
+              <button type="button" class="btn secondary" data-close>Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>© <span id="year"></span> Petitions' Campaign — Built with accessibility, privacy, and security in mind.</p>
+    </div>
+  </footer>
+
+  <!-- App logic -->
+  <script nonce="hrhub">
+    (function(){
+      'use strict';
+      
+      const start = function(){
+        const list = document.getElementById('petitions-list');
+        const count = document.getElementById('count');
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // ===== Data =====
+        const RAW = [
+          {cat:'Women', title:'Prohibit the wearing of all full-face coverings in public spaces', link:'https://petition.parliament.uk/petitions/723131', sig:63735, started:'02-May-25', deadline:'02-Nov-25'},
+          {cat:'Women', title:'Make CCTV mandatory in all taxis and private hire vehicles', link:'https://petition.parliament.uk/petitions/728891', sig:8206, started:'13-Jun-25', deadline:'13-Dec-25'},
+          {cat:'Women', title:'Fund access to tirzepatide on the NHS to help people with PCOS', link:'https://petition.parliament.uk/petitions/733320', sig:5196, started:'15-Aug-25', deadline:'15-Feb-26'},
+          {cat:'Women', title:'Introduce measures to protect women at risk of domestic violence', link:'https://petition.parliament.uk/petitions/728371', sig:1249, started:'01-Jul-25', deadline:'01-Jan-26'},
+          {cat:'Women', title:'Legally classify the creation & use of sexual deep fakes as sexual assault', link:'https://petition.parliament.uk/petitions/726264', sig:99, started:'23-May-25', deadline:'23-Nov-25'},
+          {cat:'Women', title:'Give women\'s health greater priority in the 10-Year Health Plan for England', link:'https://petition.parliament.uk/petitions/732291', sig:240, started:'29-Jul-25', deadline:'29-Jan-26'},
+          {cat:'Children & Young People', title:"Withdraw the Children's Wellbeing and Schools Bill", link:'https://petition.parliament.uk/petitions/722377', sig:165511, started:'25-Apr-25', deadline:'25-Oct-25'},
+          {cat:'Children & Young People', title:'Reduce the school week to four days a week', link:'https://petition.parliament.uk/petitions/727514', sig:124207, started:'04-Jun-25', deadline:'04-Dec-25'},
+          {cat:'Children & Young People', title:'Make it statutory guidance not to remove break-times for neurodivergent children', link:'https://petition.parliament.uk/petitions/734327', sig:38494, started:'06-Aug-25', deadline:'06-Feb-26'},
+          {cat:'Children & Young People', title:'Make neurodiversity training mandatory for all education staff', link:'https://petition.parliament.uk/petitions/724432', sig:30463, started:'10-Jul-25', deadline:'10-Jan-26'},
+          {cat:'Children & Young People', title:'Introduce a "School Allergy Safety Bill" to Protect School Pupils with Allergies', link:'https://petition.parliament.uk/petitions/728067', sig:13863, started:'30-Jun-25', deadline:'30-Dec-25'},
+          {cat:'Children & Young People', title:'Fund mandatory neurodevelopmental screening for all children', link:'https://petition.parliament.uk/petitions/731574', sig:4192, started:'01-Aug-25', deadline:'01-Feb-26'},
+          {cat:'Children & Young People', title:'Criminalise & legally require schools to tackle bullying in & out of school', link:'https://petition.parliament.uk/petitions/732221', sig:1927, started:'17-Sep-25', deadline:'17-Mar-26'},
+          {cat:'Children & Young People', title:'Require schools to let children use the toilet at all times in the school day', link:'https://petition.parliament.uk/petitions/731355', sig:1199, started:'18-Jul-25', deadline:'18-Jan-26'},
+          {cat:'Prisoners & Detention', title:'Do not put transgender people into prisons of their birth sex', link:'https://petition.parliament.uk/petitions/726169', sig:519, started:'16-Jul-25', deadline:'16-Jan-26'},
+          {cat:'Prisoners & Detention', title:'Mandate that murderers start their sentences in category A prisons', link:'https://petition.parliament.uk/petitions/729988', sig:2922, started:'30-Jun-25', deadline:'30-Dec-25'},
+          {cat:'Prisoners & Detention', title:'Amend Prison Rules to give a statutory minimum of 2 hours daily out-of-cell time', link:'https://petition.parliament.uk/petitions/742469', sig:67, started:'14-Oct-25', deadline:'14-Apr-26'},
+          {cat:'Privacy & Data', title:'Do not introduce Digital ID cards', link:'https://petition.parliament.uk/petitions/730194', sig:2915057, started:'09-Jul-25', deadline:'09-Jan-26'},
+          {cat:'Facial Recognition & Biometrics', title:'Ban Live Facial Recognition (LFR) in all public and private spaces', link:'https://petition.parliament.uk/petitions/726514', sig:626, started:'27-May-25', deadline:'27-Nov-25'},
+          {cat:'Privacy & Data', title:'Ban intelligence services use of public personal data for creating/training AI', link:'https://petition.parliament.uk/petitions/730342', sig:124, started:'23-Jul-25', deadline:'23-Jan-26'},
+          {cat:'Privacy & Data', title:'Require generative AI watermarks & ban using people\'s likeness without consent', link:'https://petition.parliament.uk/petitions/736690', sig:121, started:'04-Sep-25', deadline:'04-Mar-26'},
+          {cat:'Privacy & Data', title:'Ban the use of therapy notes of rape survivors in court proceedings', link:'https://petition.parliament.uk/petitions/738687', sig:72, started:'10-Sep-25', deadline:'10-Mar-26'},
+          {cat:'Immigration & Asylum', title:'Keep 5-year ILR terms to Hong Kong British National (Overseas) visas', link:'https://petition.parliament.uk/petitions/727356', sig:108761, started:'25-Jun-25', deadline:'25-Dec-25'},
+          {cat:'Immigration & Asylum', title:'Close the Borders! Suspend ALL immigration for 5 years!', link:'https://petition.parliament.uk/petitions/729482', sig:6039, started:'11-Jul-25', deadline:'11-Jan-26'},
+          {cat:'Immigration & Asylum', title:'Do not house illegal migrants in private rentals, deport them immediately', link:'https://petition.parliament.uk/petitions/726409', sig:3097, started:'25-Jun-25', deadline:'25-Dec-25'},
+          {cat:'Immigration & Asylum', title:'Tag and trace all illegal immigrants', link:'https://petition.parliament.uk/petitions/723533', sig:2993, started:'28-Apr-25', deadline:'28-Oct-25'},
+          {cat:'Immigration & Asylum', title:'New policies on deporting legal and illegal migrants & full ECHR withdrawal', link:'https://petition.parliament.uk/petitions/729333', sig:1997, started:'18-Jul-25', deadline:'18-Jan-26'},
+          {cat:'Immigration & Asylum', title:'Apply proposed changes to the ILR qualifying period to those already here', link:'https://petition.parliament.uk/petitions/729635', sig:1880, started:'07-Jul-25', deadline:'07-Jan-26'},
+          {cat:'Immigration & Asylum', title:'Repeal changes to immigration visa & settlement requirements announced 1/07/2025', link:'https://petition.parliament.uk/petitions/735099', sig:1493, started:'17-Sep-25', deadline:'17-Mar-26'},
+          {cat:'Immigration & Asylum', title:'Hold a referendum on stopping immigration into the UK for 30 years', link:'https://petition.parliament.uk/petitions/730009', sig:1431, started:'17-Jul-25', deadline:'17-Jan-26'},
+          {cat:'Immigration & Asylum', title:'Allow Dental Therapist & Hygienist roles (3213) to be filled by migrant workers', link:'https://petition.parliament.uk/petitions/733437', sig:1408, started:'19-Aug-25', deadline:'19-Feb-26'},
+          {cat:'Immigration & Asylum', title:'Make it mandatory for drivers to provide Driving Licence to get insurance', link:'https://petition.parliament.uk/petitions/715703', sig:1268, started:'20-May-25', deadline:'20-Nov-25'},
+          {cat:'Immigration & Asylum', title:'Keep the Graduate Route (PSW Visa) at 2 years for international students', link:'https://petition.parliament.uk/petitions/728402', sig:1208, started:'24-Jun-25', deadline:'24-Dec-25'},
+          {cat:'Immigration & Asylum', title:'Publish list of all accommodation used for illegal immigrants & asylum seekers', link:'https://petition.parliament.uk/petitions/734103', sig:1106, started:'15-Aug-25', deadline:'15-Feb-26'},
+          {cat:'Immigration & Asylum', title:'Detain all illegal migrants until a decision is made over their status', link:'https://petition.parliament.uk/petitions/736531', sig:769, started:'01-Oct-25', deadline:'01-Apr-26'},
+          {cat:'Immigration & Asylum', title:'Create a task force to find the asylum seekers the HO has lost contact with', link:'https://petition.parliament.uk/petitions/731690', sig:737, started:'14-Aug-25', deadline:'14-Feb-26'},
+          {cat:'Immigration & Asylum', title:'Scrap legal aid for all convicted criminals and recent immigrants', link:'https://petition.parliament.uk/petitions/733844', sig:724, started:'19-Aug-25', deadline:'19-Feb-26'},
+          {cat:'Immigration & Asylum', title:'Prison Officer Occupation code 3314 to be added to Immigration Salary List', link:'https://petition.parliament.uk/petitions/736200', sig:599, started:'07-Oct-25', deadline:'07-Apr-26'},
+          {cat:'Immigration & Asylum', title:'Pause immigration until Home Office processes all pending asylum applications', link:'https://petition.parliament.uk/petitions/729093', sig:553, started:'14-Aug-25', deadline:'14-Feb-26'}
+        ];
+
+        const MAP = {
+          'Individuals\' Rights': ['Privacy & Data','Facial Recognition & Biometrics'],
+          'Facial Recognition': ['Facial Recognition & Biometrics'],
+          'Privacy': ['Privacy & Data'],
+          'Family Life': [],
+          'Immigration': ['Immigration & Asylum'],
+          'Homelessness': [],
+          'Women': ['Women'],
+          'Children': ['Children & Young People'],
+          'Prisoners': ['Prisoners & Detention']
+        };
+
+        const monthMap = {Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11};
+        function parseUKShort(s){ const [d,m,y]=s.split('-'); return new Date(2000+parseInt(y,10), monthMap[m], parseInt(d,10)); }
+        function dedupeBy(arr,key){ const seen=new Set(); return arr.filter(x=>{ if(seen.has(x[key])) return false; seen.add(x[key]); return true;}); }
+        function daysUntil(d){ const t=new Date(); t.setHours(0,0,0,0); return Math.floor((d-t)/(1000*60*60*24)); }
+
+        const data = dedupeBy(RAW.map(r=>({
+          category:r.cat, title:r.title, link:r.link, signatures:+r.sig,
+          started:r.started, deadline:r.deadline,
+          startedDate: parseUKShort(r.started),
+          deadlineDate: parseUKShort(r.deadline)
+        })), 'link');
+
+        // Controls
+        let currentFilter='all', currentQuery='', currentMin=0, currentSort='expiry';
+
+        function render(filter=currentFilter, query=currentQuery, min=currentMin){
+          currentFilter=filter; currentQuery=(query||'').trim().toLowerCase(); currentMin=+min||0;
+          list.replaceChildren();
+          let items=[...data];
+          if(currentFilter!=='all'){ const cats=MAP[currentFilter]||[currentFilter]; items=items.filter(x=>cats.includes(x.category)); }
+          if(currentQuery){ items=items.filter(x=>(x.title+' '+x.category).toLowerCase().includes(currentQuery)); }
+          if(currentMin>0){ items=items.filter(x=>x.signatures>=currentMin); }
+          if(currentSort==='expiry'){ items.sort((a,b)=>a.deadlineDate-b.deadlineDate); }
+          else if(currentSort==='new'){ items.sort((a,b)=>b.startedDate-a.startedDate); }
+          else if(currentSort==='most'){ items.sort((a,b)=>b.signatures-a.signatures); }
+          if(count) count.textContent = `${items.length} petition${items.length!==1?'s':''}`;
+
+          if (items.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = '<p>No petitions match your search criteria. Try adjusting your filters.</p>';
+            list.appendChild(emptyState);
+            return;
+          }
+
+          for(const p of items){
+            const dLeft = daysUntil(p.deadlineDate);
+            const card = document.createElement('article'); card.className='card'; card.setAttribute('role','listitem');
+            const h3 = document.createElement('h3'); h3.textContent=p.title; card.appendChild(h3);
+            const mStart=document.createElement('p'); mStart.className='meta'; mStart.innerHTML=`<strong>Started:</strong> ${p.started}`; card.appendChild(mStart);
+            const mExp=document.createElement('p'); mExp.className='meta'; mExp.innerHTML=`<strong>Expiry:</strong> ${p.deadline}`; if(dLeft<0){ mExp.classList.add('status--expired'); } card.appendChild(mExp);
+            const mSig=document.createElement('p'); mSig.className='meta'; mSig.innerHTML=`<strong>Signatures:</strong> ${p.signatures.toLocaleString('en-GB')}`; card.appendChild(mSig);
+            const a=document.createElement('a'); a.className='cta'; a.href=p.link; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent='View & Sign';
+            if(dLeft<=7 && dLeft>=0){ a.classList.add('status--danger'); } else if(dLeft<=31 && dLeft>=0){ a.classList.add('status--warn'); }
+            a.addEventListener('click', (e)=>{ e.preventDefault(); openPanel(p); });
+            card.appendChild(a);
+            const badge=document.createElement('span'); badge.className='badge'; badge.textContent=p.category; card.appendChild(badge);
+            list.appendChild(card);
+          }
+        }
+
+        function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); }; }
+        const qEl=document.getElementById('q'), minEl=document.getElementById('minSig');
+        const onSearch=debounce(()=>render(currentFilter,qEl.value,minEl.value),200);
+        if(qEl) qEl.addEventListener('input', onSearch);
+        if(minEl) minEl.addEventListener('input', onSearch);
+
+        const sortSel=document.getElementById('sort');
+        if(sortSel) sortSel.addEventListener('change', ()=>{ currentSort=sortSel.value; render(); });
+
+        // Side panel
+        const overlay=document.getElementById('overlay');
+        const sidepanel=document.getElementById('sidepanel');
+        const closeBtn=document.getElementById('panel-close');
+
+        function autoSummary(title){ return `This petition calls for action: "${title.trim()}". Read details and add your signature on the official Parliament website.`; }
+
+        function openPanel(p){
+          document.getElementById('panel-h3').textContent=p.title;
+          document.getElementById('panel-summary').textContent=autoSummary(p.title);
+          document.getElementById('panel-start').textContent=`Started: ${p.started}`;
+          document.getElementById('panel-exp').textContent=`Expiry: ${p.deadline}`;
+          document.getElementById('panel-sig').textContent=`Signatures: ${p.signatures.toLocaleString('en-GB')}`;
+          const link=document.getElementById('panel-link'); link.href=p.link;
+          overlay.setAttribute('aria-hidden','false'); sidepanel.setAttribute('aria-hidden','false');
+          drawChart(p);
+          closeBtn && closeBtn.focus();
+        }
+        function closePanel(){ overlay.setAttribute('aria-hidden','true'); sidepanel.setAttribute('aria-hidden','true'); }
+        if(overlay) overlay.addEventListener('click', closePanel);
+        if(closeBtn) closeBtn.addEventListener('click', closePanel);
+        document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePanel(); });
+
+        function drawChart(p){
+          const c=document.getElementById('sigChart'); if(!c) return;
+          const ctx=c.getContext('2d'); const dpr=window.devicePixelRatio||1;
+          const w=c.width=c.getBoundingClientRect().width*dpr; const h=c.height=220*dpr;
+          ctx.clearRect(0,0,w,h);
+          const steps=12, vals=Array.from({length:steps},(_,i)=>Math.round(p.signatures*(i/(steps-1))**1.2));
+          const max=Math.max(...vals)||1, pad=24*dpr, gx=(w-pad*2)/(steps-1);
+          ctx.globalAlpha=.3; ctx.strokeStyle='#7fd8a8'; ctx.lineWidth=1;
+          for(let y=0;y<4;y++){ const yy=pad+(y*(h-pad*2)/3); ctx.beginPath(); ctx.moveTo(pad,yy); ctx.lineTo(w-pad,yy); ctx.stroke(); }
+          ctx.globalAlpha=1; ctx.strokeStyle='#2bd26e'; ctx.lineWidth=3*dpr; ctx.beginPath();
+          vals.forEach((v,i)=>{ const x=pad+gx*i; const y=h-pad-(v/max)*(h-pad*2); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+          ctx.stroke();
+        }
+
+        // Floating navigation functionality
+        const floatingNav = document.querySelector('.floating-nav');
+        const floatingLinks = floatingNav.querySelectorAll('a');
+        const sections = document.querySelectorAll('section');
+        const backToTop = document.getElementById('backToTop');
+        
+        // Update active state on scroll
+        function updateActiveNav() {
+          let current = '';
+          sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (scrollY >= sectionTop) {
+              current = section.getAttribute('id');
+            }
+          });
+          
+          floatingLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+              link.classList.add('active');
+            }
+          });
+          
+          // Show/hide back to top button
+          if (window.scrollY > 500) {
+            backToTop.classList.add('visible');
+          } else {
+            backToTop.classList.remove('visible');
+          }
+        }
+        
+        window.addEventListener('scroll', updateActiveNav);
+        
+        // Back to top functionality
+        backToTop.addEventListener('click', () => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        });
+        
+        // Floating sign in button
+        const floatingSignIn = document.getElementById('floatingSignIn');
+        const signinModal = document.getElementById('signinModal');
+        
+        if (floatingSignIn && signinModal) {
+          floatingSignIn.addEventListener('click', (e) => {
+            e.preventDefault();
+            signinModal.setAttribute('aria-hidden', 'false');
+          });
+        }
+
+        // Initial render
+        setTimeout(() => {
+          document.getElementById('loading-state').style.display = 'none';
+          render('all');
+          updateActiveNav(); // Set initial active state
+        }, 500);
+
+        // Smart Register shortcut: if signed in → handled by auth; if known users exist → open Sign in; else → Sign up
+        const smartRegBtn = document.getElementById('openSignUp');
+        if (smartRegBtn) {
+          smartRegBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            const authed = !!localStorage.getItem('hrhub_auth');
+            if (authed) return; // auth block will switch this to Sign out
+            const users = JSON.parse(localStorage.getItem('hrhub_users')||'[]');
+            const preferSignin = Array.isArray(users) && users.length>0;
+            const si=document.getElementById('signinModal'); const su=document.getElementById('signupModal');
+            if(preferSignin && si) si.setAttribute('aria-hidden','false');
+            else if(su) su.setAttribute('aria-hidden','false');
+          });
+        }
+      };
+
+      if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+    })();
+  </script>
+
+  <!-- Auth + submit logic -->
+  <script nonce="hrhub">
+    // ===== Auth state & modals (Sign in / smart Register / Sign out) =====
+    (function(){
+      'use strict';
+      
+      const AUTH_KEY='hrhub_auth';
+      const USERS_KEY='hrhub_users';
+      const RESET_CODES_KEY='hrhub_reset_codes';
+      const signinModal=document.getElementById('signinModal');
+      const signupModal=document.getElementById('signupModal');
+      const resetModal=document.getElementById('resetModal');
+      const openSignIn=document.getElementById('openSignIn');
+      const openSignUp=document.getElementById('openSignUp');
+      const form=document.getElementById('petitionForm');
+      const forgotLink = document.getElementById('forgotLink');
+
+      function openModal(m){ if(m) m.setAttribute('aria-hidden','false'); }
+      function closeModal(m){ if(m) m.setAttribute('aria-hidden','true'); }
+      function getUser(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch{ return null; } }
+      function setUser(u){ localStorage.setItem(AUTH_KEY, JSON.stringify(u)); updateAuthUI(); }
+      function clearUser(){ localStorage.removeItem(AUTH_KEY); updateAuthUI(); }
+      function isAuthed(){ return !!getUser(); }
+      function getUsers(){ try{ const arr=JSON.parse(localStorage.getItem(USERS_KEY)||'[]'); return Array.isArray(arr)?arr:[]; }catch{ return []; } }
+      function addUser(email){ const arr=getUsers(); if(email && !arr.includes(email)){ arr.push(email); localStorage.setItem(USERS_KEY, JSON.stringify(arr)); } }
+      function getResetCodes(){ try{ return JSON.parse(localStorage.getItem(RESET_CODES_KEY)||'{}'); }catch{ return {}; } }
+      function setResetCode(email, code){ const codes=getResetCodes(); codes[email]=code; localStorage.setItem(RESET_CODES_KEY, JSON.stringify(codes)); }
+      function removeResetCode(email){ const codes=getResetCodes(); delete codes[email]; localStorage.setItem(RESET_CODES_KEY, JSON.stringify(codes)); }
+      window.hr_isAuthed=isAuthed;
+
+      function updateAuthUI(){
+        if(!form) return;
+        if(isAuthed()){
+          Array.from(form.elements).forEach(el=> el.disabled=false);
+          const lock=document.getElementById('submitLock'); if(lock) lock.remove();
+          if(openSignUp){ openSignUp.textContent='Sign out'; openSignUp.onclick=(e)=>{ e.preventDefault(); clearUser(); if(openSignIn) openSignIn.textContent='Sign in'; if(openSignUp) openSignUp.textContent='Register'; }; }
+          if(openSignIn){ const u=getUser(); openSignIn.textContent=(u&&(u.name||u.email))||'Account'; openSignIn.onclick=(e)=> e.preventDefault(); }
+        } else {
+          Array.from(form.elements).forEach(el=> el.disabled=true);
+          const btn=document.getElementById('submitBtn'); if(btn) btn.disabled=true;
+          if(!document.getElementById('submitLock')){
+            const notice=document.createElement('div');
+            notice.id='submitLock'; notice.className='help';
+            notice.innerHTML='Please <a href=\"#\" id=\"lockSignIn\">sign in</a> or <a href=\"#\" id=\"lockSignUp\">register</a> to submit a petition.';
+            form.prepend(notice);
+            notice.querySelector('#lockSignIn').addEventListener('click',(e)=>{ e.preventDefault(); openModal(signinModal); });
+            notice.querySelector('#lockSignUp').addEventListener('click',(e)=>{ e.preventDefault(); const users=getUsers(); (users.length? openModal(signinModal): openModal(signupModal)); });
+          }
+          if(openSignIn){ openSignIn.textContent='Sign in'; openSignIn.onclick=(e)=>{ e.preventDefault(); openModal(signinModal); }; }
+          if(openSignUp){ openSignUp.textContent='Register'; openSignUp.onclick=(e)=>{ e.preventDefault(); const users=getUsers(); (users.length? openModal(signinModal): openModal(signupModal)); }; }
+        }
+      }
+
+      // Close modals + Esc
+      document.querySelectorAll('.modal [data-close]').forEach(el=> el.addEventListener('click', ()=> closeModal(el.closest('.modal'))));
+      document.querySelectorAll('.modal .modal-bg').forEach(bg=> bg.addEventListener('click', ()=> closeModal(bg.closest('.modal'))));
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ [signinModal, signupModal, resetModal].forEach(m=> closeModal(m)); } });
+
+      // Password show/hide
+      document.querySelectorAll('.toggle-pwd').forEach(btn=> btn.addEventListener('click', ()=>{
+        const id=btn.getAttribute('data-toggle'); const inp=document.getElementById(id); if(!inp) return;
+        inp.type=(inp.type==='password')?'text':'password';
+      }));
+
+      // Forgot password functionality
+      if (forgotLink) {
+        forgotLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          closeModal(signinModal);
+          openModal(resetModal);
+          resetToStep(1);
+        });
+      }
+
+      // Reset password modal functionality
+      function resetToStep(step) {
+        // Hide all steps
+        document.querySelectorAll('.reset-step').forEach(el => {
+          el.classList.remove('active');
+        });
+        // Show the requested step
+        document.getElementById(`resetStep${step}`).classList.add('active');
+        
+        // Clear errors
+        document.querySelectorAll('#resetErrors1, #resetErrors2, #resetErrors3').forEach(el => {
+          el.textContent = '';
+        });
+        
+        // Focus on first input
+        const firstInput = document.querySelector(`#resetStep${step} input`);
+        if (firstInput) firstInput.focus();
+      }
+
+      // Step 1: Email submission
+      const resetForm1 = document.getElementById('resetForm1');
+      if (resetForm1) {
+        resetForm1.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const email = document.getElementById('resetEmail').value.trim();
+          const errors = document.getElementById('resetErrors1');
+          
+          if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+            errors.textContent = 'Please enter a valid email address.';
+            return;
+          }
+          
+          // Check if email exists in users
+          const users = getUsers();
+          if (!users.includes(email)) {
+            errors.textContent = 'No account found with this email address.';
+            return;
+          }
+          
+          // Generate and store reset code
+          const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+          setResetCode(email, resetCode);
+          
+          // In a real app, you would send this code via email
+          console.log(`Reset code for ${email}: ${resetCode}`); // For demo purposes
+          
+          // Move to step 2
+          resetToStep(2);
+        });
+      }
+
+      // Step 2: Code verification
+      const resetForm2 = document.getElementById('resetForm2');
+      const backToEmail = document.getElementById('backToEmail');
+      const resendCode = document.getElementById('resendCode');
+      
+      if (resetForm2) {
+        resetForm2.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const email = document.getElementById('resetEmail').value.trim();
+          const code = document.getElementById('resetCode').value.trim();
+          const errors = document.getElementById('resetErrors2');
+          const storedCode = getResetCodes()[email];
+          
+          if (!code || code.length !== 6) {
+            errors.textContent = 'Please enter the 6-digit code.';
+            return;
+          }
+          
+          if (code !== storedCode) {
+            errors.textContent = 'Invalid verification code. Please try again.';
+            return;
+          }
+          
+          // Code is valid, move to step 3
+          resetToStep(3);
+        });
+      }
+      
+      if (backToEmail) {
+        backToEmail.addEventListener('click', () => {
+          resetToStep(1);
+        });
+      }
+      
+      if (resendCode) {
+        resendCode.addEventListener('click', () => {
+          const email = document.getElementById('resetEmail').value.trim();
+          if (!email) {
+            resetToStep(1);
+            return;
+          }
+          
+          // Generate new code
+          const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+          setResetCode(email, resetCode);
+          
+          console.log(`New reset code for ${email}: ${resetCode}`); // For demo purposes
+          
+          document.getElementById('resetErrors2').textContent = 'New code sent! Check your email.';
+        });
+      }
+
+      // Step 3: New password
+      const resetForm3 = document.getElementById('resetForm3');
+      const newPassword = document.getElementById('newPassword');
+      const newPwdMeter = document.getElementById('newPwdMeter');
+      
+      // Password strength meter for reset form
+      function strength(p){ 
+        let s=0; 
+        if(p.length>=8) s++; 
+        if(/[0-9]/.test(p)) s++; 
+        if(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(p)) s++; 
+        if(/[A-Z]/.test(p)&&/[a-z]/.test(p)) s++; 
+        return s>=3?3:(s===2?2:1); 
+      }
+      
+      if (newPassword) {
+        newPassword.addEventListener('input', ()=>{
+          const lvl=strength(newPassword.value); 
+          newPwdMeter.className='meter meter--'+lvl; 
+        }); 
+      }
+      
+      if (resetForm3) {
+        resetForm3.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const email = document.getElementById('resetEmail').value.trim();
+          const newPwd = newPassword.value;
+          const confirmPwd = document.getElementById('confirmPassword').value;
+          const errors = document.getElementById('resetErrors3');
+          const success = document.getElementById('resetSuccess');
+          
+          // Validate password
+          if (newPwd.length < 8 || !/[0-9]/.test(newPwd) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(newPwd)) {
+            errors.textContent = 'Password must be 8+ characters including a number & symbol.';
+            return;
+          }
+          
+          if (newPwd !== confirmPwd) {
+            errors.textContent = 'Passwords do not match.';
+            return;
+          }
+          
+          // In a real app, you would update the password in your backend
+          // For this demo, we'll just show success and clear the reset code
+          removeResetCode(email);
+          
+          errors.textContent = '';
+          success.style.display = 'block';
+          
+          // Close modal after 3 seconds
+          setTimeout(() => {
+            closeModal(resetModal);
+            openModal(signinModal);
+          }, 3000);
+        });
+      }
+
+      // Sign in
+      const siForm=document.getElementById('signinForm');
+      if(siForm){
+        siForm.addEventListener('submit',(e)=>{
+          e.preventDefault();
+          const email=document.getElementById('siEmail').value.trim();
+          const pwd=document.getElementById('siPassword').value.trim();
+          const box=document.getElementById('siErrors'); box.textContent='';
+          const errs=[];
+          if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errs.push('Enter a valid email.');
+          if(pwd.length<8) errs.push('Password must be at least 8 characters.');
+          if(errs.length){ box.innerHTML=errs.map(x=>`• ${x}`).join('<br>'); return; }
+          setUser({ email }); addUser(email); closeModal(signinModal);
+        });
+      }
+
+      // Sign up + meter
+      const suForm=document.getElementById('signupForm');
+      const suPwd=document.getElementById('suPassword');
+      const suPwd2=document.getElementById('suPassword2');
+      const meter=document.getElementById('pwdMeter');
+      function strength(p){ let s=0; if(p.length>=8) s++; if(/[0-9]/.test(p)) s++; if(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(p)) s++; if(/[A-Z]/.test(p)&&/[a-z]/.test(p)) s++; return s>=3?3:(s===2?2:1); }
+      if(suPwd){ suPwd.addEventListener('input', ()=>{ const lvl=strength(suPwd.value); meter.className='meter meter--'+lvl; }); }
+      if(suForm){
+        suForm.addEventListener('submit',(e)=>{
+          e.preventDefault();
+          const name=document.getElementById('suName').value.trim();
+          const email=document.getElementById('suEmail').value.trim();
+          const pwd=suPwd.value; const pwd2=suPwd2.value; const agree=document.getElementById('suAgree').checked;
+          const box=document.getElementById('suErrors'); box.textContent='';
+          const errs=[];
+          if(!name) errs.push('Full name is required.');
+          if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errs.push('Enter a valid email.');
+          if(pwd.length<8 || !/[0-9]/.test(pwd) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd)) errs.push('Password must be 8+ chars incl. a number & symbol.');
+          if(pwd!==pwd2) errs.push('Passwords do not match.');
+          if(!agree) errs.push('You must agree to the Submission & Safety Policy.');
+          if(errs.length){ box.innerHTML=errs.map(x=>`• ${x}`).join('<br>'); return; }
+          addUser(email); setUser({ name, email }); closeModal(signupModal);
+        });
+      }
+
+      // Open policy from signup
+      const openPolicyFromSignup=document.getElementById('openPolicyFromSignup');
+      const policyModal=document.getElementById('policyModal');
+      if(openPolicyFromSignup){ openPolicyFromSignup.addEventListener('click',(e)=>{ e.preventDefault(); closeModal(signupModal); openModal(policyModal); }); }
+
+      updateAuthUI();
+    })();
+
+    // ===== Submit form logic =====
+    (function(){
+      'use strict';
+      
+      const form=document.getElementById('petitionForm'); if(!form) return;
+      const linkEl=document.getElementById('petLink');
+      const titleEl=document.getElementById('petTitle');
+      const descEl=document.getElementById('petDesc');
+      const agreeEl=document.getElementById('agreePolicy');
+      const errors=document.getElementById('formErrors');
+      const success=document.getElementById('formSuccess');
+      const submitBtn=document.getElementById('submitBtn');
+      const countEl=document.getElementById('descCount');
+
+      const policyModal=document.getElementById('policyModal');
+      const openPolicy=document.getElementById('openPolicy');
+
+      const TRUSTED_HOSTS=new Set(['petition.parliament.uk']);
+      const PROHIBITED=[/\b(incite|violence|terror|bomb)\b/i];
+
+      const maxChars=1000;
+      const updateCount=()=>{ const n=(descEl.value||'').length; countEl.textContent=`${n} / ${maxChars}`; };
+      descEl.addEventListener('input', updateCount); updateCount();
+
+      function showPolicy(open=true){ policyModal.setAttribute('aria-hidden', open? 'false':'true'); }
+      document.querySelectorAll('#policyModal [data-close]').forEach(el=> el.addEventListener('click', ()=> showPolicy(false)));
+      if(openPolicy){ openPolicy.addEventListener('click', (e)=>{ e.preventDefault(); showPolicy(true); }); }
+
+      function validate(){
+        errors.innerHTML=''; const list=[];
+        try{
+          const url=new URL(linkEl.value);
+          if(url.protocol!=='https:') list.push('Link must use HTTPS.');
+          if(!TRUSTED_HOSTS.has(url.hostname)) list.push('Only official UK petition hosts are allowed.');
+        }catch{ list.push('Please enter a valid petition URL.'); }
+
+        if(!titleEl.value.trim()) list.push('Title is required.');
+        const txt=descEl.value.trim();
+        if(!txt) list.push('Description is required.');
+        if(txt.length>maxChars) list.push('Description must be 1000 characters or fewer.');
+        if(PROHIBITED.some(rx=>rx.test(txt))) list.push('Description may not contain prohibited terms.');
+        if(!agreeEl.checked) list.push('You must agree to the Submission & Safety Policy.');
+
+        if(list.length){
+          errors.innerHTML=list.map(x=>`• ${x}`).join('<br>');
+          (linkEl.validity.valid ? (titleEl.value ? (txt && txt.length<=maxChars ? agreeEl : descEl) : titleEl) : linkEl).focus();
+          return false;
+        }
+        return true;
+      }
+
+      form.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        if(!window.hr_isAuthed || !window.hr_isAuthed()){
+          errors.innerHTML='You must be signed in to submit a petition.';
+          const si=document.getElementById('signinModal'); if(si){ si.setAttribute('aria-hidden','false'); }
+          return;
+        }
+        if(!validate()) return;
+        submitBtn.disabled=true;
+        submitBtn.classList.add('loading');
+        setTimeout(()=>{
+          success.hidden=false; errors.textContent=''; submitBtn.disabled=false; submitBtn.classList.remove('loading'); form.reset(); updateCount();
+          setTimeout(() => { success.hidden = true; }, 5000);
+        },300);
+      });
+    })();
+  </script>
+</body>
+</html>
